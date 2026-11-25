@@ -25,18 +25,15 @@
     $lblPC.ForeColor = $textColor
     $form.Controls.Add($lblPC)
 
-    # ЗАМЕНИЛИ TEXTBOX НА COMBOBOX (Выпадающий список)
     $txtPC = New-Object System.Windows.Forms.ComboBox
     $txtPC.Location = New-Object System.Drawing.Point(85, 12)
     $txtPC.Size = New-Object System.Drawing.Size(180, 20)
     $txtPC.BackColor = $panelColor
     $txtPC.ForeColor = $textColor
     $txtPC.FlatStyle = 'Flat'
-    $txtPC.DropDownStyle = 'DropDown' # Разрешаем вводить текст вручную
+    $txtPC.DropDownStyle = 'DropDown' 
     $txtPC.AutoCompleteMode = 'SuggestAppend'
     $txtPC.AutoCompleteSource = 'ListItems'
-    
-    # Клик по полю сразу открывает список
     $txtPC.Add_Click({ $txtPC.DroppedDown = $true })
     $form.Controls.Add($txtPC)
 
@@ -48,12 +45,12 @@
     $btnConnect.ForeColor = [System.Drawing.Color]::LightGreen
     $btnConnect.FlatStyle = 'Flat'
     $btnConnect.FlatAppearance.BorderColor = [System.Drawing.Color]::Gray
+    $btnConnect.TabStop = $false
     $form.Controls.Add($btnConnect)
 
-    # Нажатие Enter в поле ввода нажимает кнопку Connect
     $txtPC.Add_KeyDown({
         if ($_.KeyCode -eq 'Enter') { 
-            $_.SuppressKeyPress = $true # Чтобы не пикало
+            $_.SuppressKeyPress = $true
             $btnConnect.PerformClick() 
         }
     })
@@ -82,7 +79,7 @@
     # БЛОК КНОПОК И УСТАНОВКИ
     # ==========================================
 
-    # 1-й ряд (Диагностика - Синий)
+    # 1-й ряд (Диагностика)
     $btnSysInfo = New-Object System.Windows.Forms.Button
     $btnSysInfo.Text = "System Info"
     $btnSysInfo.Location = New-Object System.Drawing.Point(10, 60)
@@ -90,7 +87,7 @@
     $btnSysInfo.BackColor = $diagColor; $btnSysInfo.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnSysInfo.FlatStyle = 'Flat'; $btnSysInfo.FlatAppearance.BorderSize = 0
     $btnSysInfo.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnSysInfo.Enabled = $false
+    $btnSysInfo.Enabled = $false; $btnSysInfo.TabStop = $false
     $form.Controls.Add($btnSysInfo)
 
     $btnDiskSpace = New-Object System.Windows.Forms.Button
@@ -100,7 +97,7 @@
     $btnDiskSpace.BackColor = $diagColor; $btnDiskSpace.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnDiskSpace.FlatStyle = 'Flat'; $btnDiskSpace.FlatAppearance.BorderSize = 0
     $btnDiskSpace.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnDiskSpace.Enabled = $false
+    $btnDiskSpace.Enabled = $false; $btnDiskSpace.TabStop = $false
     $form.Controls.Add($btnDiskSpace)
 
     $btnSearchApps = New-Object System.Windows.Forms.Button
@@ -110,7 +107,7 @@
     $btnSearchApps.BackColor = $diagColor; $btnSearchApps.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnSearchApps.FlatStyle = 'Flat'; $btnSearchApps.FlatAppearance.BorderSize = 0
     $btnSearchApps.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnSearchApps.Enabled = $false
+    $btnSearchApps.Enabled = $false; $btnSearchApps.TabStop = $false
     $form.Controls.Add($btnSearchApps)
 
     $btnRunCmd = New-Object System.Windows.Forms.Button
@@ -120,7 +117,7 @@
     $btnRunCmd.BackColor = $diagColor; $btnRunCmd.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnRunCmd.FlatStyle = 'Flat'; $btnRunCmd.FlatAppearance.BorderSize = 0
     $btnRunCmd.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnRunCmd.Enabled = $false
+    $btnRunCmd.Enabled = $false; $btnRunCmd.TabStop = $false
     $form.Controls.Add($btnRunCmd)
 
     # 2-й ряд (Установка)
@@ -147,7 +144,7 @@
     $btnInstall.BackColor = $actionColor; $btnInstall.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnInstall.FlatStyle = 'Flat'; $btnInstall.FlatAppearance.BorderSize = 0
     $btnInstall.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnInstall.Enabled = $false
+    $btnInstall.Enabled = $false; $btnInstall.TabStop = $false
     $form.Controls.Add($btnInstall)
 
     $btnOpenInstallers = New-Object System.Windows.Forms.Button
@@ -157,6 +154,7 @@
     $btnOpenInstallers.BackColor = $panelColor; $btnOpenInstallers.ForeColor = $textColor
     $btnOpenInstallers.FlatStyle = 'Flat'; $btnOpenInstallers.FlatAppearance.BorderSize = 0
     $btnOpenInstallers.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
+    $btnOpenInstallers.TabStop = $false
     $form.Controls.Add($btnOpenInstallers)
 
     $btnRefreshList = New-Object System.Windows.Forms.Button
@@ -166,6 +164,7 @@
     $btnRefreshList.BackColor = $panelColor; $btnRefreshList.ForeColor = $textColor
     $btnRefreshList.FlatStyle = 'Flat'; $btnRefreshList.FlatAppearance.BorderSize = 0
     $btnRefreshList.Font = New-Object System.Drawing.Font("Segoe UI Emoji", 14, [System.Drawing.FontStyle]::Bold)
+    $btnRefreshList.TabStop = $false
     $form.Controls.Add($btnRefreshList)
 
     # 3-й ряд (Действия)
@@ -176,7 +175,7 @@
     $btnClearTemp.BackColor = $actionColor; $btnClearTemp.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnClearTemp.FlatStyle = 'Flat'; $btnClearTemp.FlatAppearance.BorderSize = 0
     $btnClearTemp.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnClearTemp.Enabled = $false
+    $btnClearTemp.Enabled = $false; $btnClearTemp.TabStop = $false
     $form.Controls.Add($btnClearTemp)
 
     $btnFixSpooler = New-Object System.Windows.Forms.Button
@@ -186,7 +185,7 @@
     $btnFixSpooler.BackColor = $actionColor; $btnFixSpooler.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnFixSpooler.FlatStyle = 'Flat'; $btnFixSpooler.FlatAppearance.BorderSize = 0
     $btnFixSpooler.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnFixSpooler.Enabled = $false
+    $btnFixSpooler.Enabled = $false; $btnFixSpooler.TabStop = $false
     $form.Controls.Add($btnFixSpooler)
 
     $btnUpdates = New-Object System.Windows.Forms.Button
@@ -196,17 +195,17 @@
     $btnUpdates.BackColor = $actionColor; $btnUpdates.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnUpdates.FlatStyle = 'Flat'; $btnUpdates.FlatAppearance.BorderSize = 0
     $btnUpdates.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnUpdates.Enabled = $false
+    $btnUpdates.Enabled = $false; $btnUpdates.TabStop = $false
     $form.Controls.Add($btnUpdates)
 
     $btnReboot = New-Object System.Windows.Forms.Button
     $btnReboot.Text = "Reboot PC"
-    $btnReboot.Location = New-Object System.Drawing.Point(590, 140)
+    $btnReboot.Location = New-Object System.Drawing.Point(445, 140) 
     $btnReboot.Size = New-Object System.Drawing.Size(135, 30)
     $btnReboot.BackColor = $dangerColor; $btnReboot.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnReboot.FlatStyle = 'Flat'; $btnReboot.FlatAppearance.BorderSize = 0
     $btnReboot.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnReboot.Enabled = $false
+    $btnReboot.Enabled = $false; $btnReboot.TabStop = $false
     $form.Controls.Add($btnReboot)
 
     # 4-й ряд (Новые фичи)
@@ -217,7 +216,7 @@
     $btnProcesses.BackColor = $diagColor; $btnProcesses.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnProcesses.FlatStyle = 'Flat'; $btnProcesses.FlatAppearance.BorderSize = 0
     $btnProcesses.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnProcesses.Enabled = $false
+    $btnProcesses.Enabled = $false; $btnProcesses.TabStop = $false
     $form.Controls.Add($btnProcesses)
 
     $btnEventLogs = New-Object System.Windows.Forms.Button
@@ -227,15 +226,25 @@
     $btnEventLogs.BackColor = $diagColor; $btnEventLogs.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
     $btnEventLogs.FlatStyle = 'Flat'; $btnEventLogs.FlatAppearance.BorderSize = 0
     $btnEventLogs.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
-    $btnEventLogs.Enabled = $false
+    $btnEventLogs.Enabled = $false; $btnEventLogs.TabStop = $false
     $form.Controls.Add($btnEventLogs)
 
-    $allActionButtons = @($btnSysInfo, $btnDiskSpace, $btnSearchApps, $btnRunCmd, $btnInstall, $btnClearTemp, $btnFixSpooler, $btnUpdates, $btnReboot, $btnProcesses, $btnEventLogs)
+    $btnMassSearch = New-Object System.Windows.Forms.Button
+    $btnMassSearch.Text = "Mass Search"
+    $btnMassSearch.Location = New-Object System.Drawing.Point(300, 180)
+    $btnMassSearch.Size = New-Object System.Drawing.Size(135, 30)
+    $btnMassSearch.BackColor = $diagColor; $btnMassSearch.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
+    $btnMassSearch.FlatStyle = 'Flat'; $btnMassSearch.FlatAppearance.BorderSize = 0
+    $btnMassSearch.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
+    $btnMassSearch.Enabled = $false; $btnMassSearch.TabStop = $false
+    $form.Controls.Add($btnMassSearch)
+
+    $allActionButtons = @($btnSysInfo, $btnDiskSpace, $btnSearchApps, $btnRunCmd, $btnInstall, $btnClearTemp, $btnFixSpooler, $btnUpdates, $btnReboot, $btnProcesses, $btnEventLogs, $btnMassSearch)
 
     # --- ОКНО ЛОГА ---
     $global:txtLog = New-Object System.Windows.Forms.TextBox
     $global:txtLog.Location = New-Object System.Drawing.Point(10, 220)
-    $global:txtLog.Size = New-Object System.Drawing.Size(725, 380)
+    $global:txtLog.Size = New-Object System.Drawing.Size(725, 380) 
     $global:txtLog.Multiline = $true
     $global:txtLog.ScrollBars = "Vertical"
     $global:txtLog.ReadOnly = $true
@@ -253,6 +262,7 @@
     $btnClear.BackColor = $panelColor; $btnClear.ForeColor = $dangerColor
     $btnClear.FlatStyle = 'Flat'; $btnClear.FlatAppearance.BorderSize = 0
     $btnClear.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+    $btnClear.TabStop = $false
     $form.Controls.Add($btnClear)
 
     $btnOpenLogs = New-Object System.Windows.Forms.Button
@@ -262,6 +272,7 @@
     $btnOpenLogs.BackColor = $panelColor; $btnOpenLogs.ForeColor = $diagColor 
     $btnOpenLogs.FlatStyle = 'Flat'; $btnOpenLogs.FlatAppearance.BorderSize = 0
     $btnOpenLogs.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+    $btnOpenLogs.TabStop = $false
     $form.Controls.Add($btnOpenLogs)
 
     # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ИНТЕРФЕЙСА ---
@@ -293,6 +304,28 @@
     }
 
     # --- ОБРАБОТЧИКИ ---
+    
+    # Обработчик Mass Search
+    $btnMassSearch.Add_Click({
+        $query = [Microsoft.VisualBasic.Interaction]::InputBox("Enter folder name or exact path to search:", "Mass Search", "")
+        if (-not $query) { return }
+
+        Execute-AsyncAction {
+            Write-UILog -LogBox $global:txtLog -Message "Searching for '$query'..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
+            $res = Find-RemoteFolder -Session $global:PSSession -SearchQuery $query
+            
+            $res | ForEach-Object {
+                if ($_.Status -eq "Found") {
+                    # ЗЕЛЕНЫЙ ЦВЕТ, ЕСЛИ НАШЛИ
+                    Write-UILog -LogBox $global:txtLog -Message "[$($_.PC)] FOUND: $($_.Path)" -TargetPC $_.PC -Color ([System.Drawing.Color]::LightGreen)
+                } else {
+                    # КРАСНЫЙ ЦВЕТ, ЕСЛИ НЕ НАШЛИ
+                    Write-UILog -LogBox $global:txtLog -Message "[$($_.PC)] $($_.Path)" -TargetPC $_.PC -Color ([System.Drawing.Color]::Red)
+                }
+            }
+        }
+    })
+
     $btnOpenInstallers.Add_Click({
         if (-not (Test-Path $global:InstallerDir)) { New-Item -ItemType Directory -Path $global:InstallerDir -Force | Out-Null }
         Start-Process explorer.exe -ArgumentList $global:InstallerDir
@@ -306,13 +339,9 @@
     $btnConnect.Add_Click({
         $rawPCs = $txtPC.Text.Trim()
         if (-not $rawPCs) { return }
-        
         Add-PCHistory -PCString $rawPCs
-        
-        # Обновляем список в ComboBox
         $txtPC.Items.Clear()
         if ($global:PCHistory.Count -gt 0) { $txtPC.Items.AddRange($global:PCHistory) }
-
         $pcList = $rawPCs -split '[, ]+' | Where-Object { $_ -ne "" }
 
         Execute-AsyncAction {
@@ -345,9 +374,7 @@
         $extension = [System.IO.Path]::GetExtension($filePath).ToLower()
         $defaultArgs = if ($extension -eq ".msi") { "/qn /norestart" } else { "/S" }
         $silentArgs = [Microsoft.VisualBasic.Interaction]::InputBox("Enter silent arguments for ${selectedItem}:", "Silent Args", $defaultArgs)
-        
         if ($silentArgs -eq $null) { return }
-
         Execute-AsyncAction {
             Write-UILog -LogBox $global:txtLog -Message "Installing $selectedItem..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
             if ($extension -eq ".msi") { $res = Install-RemoteMsi -Session $global:PSSession -FilePath $filePath } 
@@ -364,7 +391,6 @@
     $btnFixSpooler.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Restarting Spooler..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); (Restart-RemoteSpooler -Session $global:PSSession) | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } })
     $btnUpdates.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Searching and installing updates (this may take a while)..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); $res = Install-RemoteUpdates -Session $global:PSSession; $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.ToString())" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } })
 
-    # Окно процессов
     $btnProcesses.Add_Click({
         Execute-AsyncAction {
             Write-UILog -LogBox $global:txtLog -Message "Fetching processes..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
@@ -407,7 +433,6 @@
         }
     })
 
-    # Окно логов
     $btnEventLogs.Add_Click({
         Execute-AsyncAction {
             Write-UILog -LogBox $global:txtLog -Message "Fetching system errors from last 24h..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
@@ -432,7 +457,6 @@
         }
     })
 
-    # Окно поиска программ
     $btnSearchApps.Add_Click({
         Execute-AsyncAction {
             Write-UILog -LogBox $global:txtLog -Message "Fetching all installed apps..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
@@ -479,16 +503,13 @@
     $form.Add_Shown({ 
         [DarkTitleBar]::Apply($form.Handle)
         Load-PCHistory
-        
-        # Заполняем ComboBox историей
         $txtPC.Items.Clear()
         if ($global:PCHistory.Count -gt 0) { 
             $txtPC.Items.AddRange($global:PCHistory)
-            $txtPC.Text = $global:PCHistory[0] # Автоматически подставляем последний ПК
+            $txtPC.Text = $global:PCHistory[0]
         }
-        
         Refresh-InstallerList
-        Write-UILog -LogBox $global:txtLog -Message "Program initialized. Drop .exe/.msi into the Installers folder." -TargetPC "General" -Color ([System.Drawing.Color]::Gray)
+        Write-UILog -LogBox $global:txtLog -Message "Program initialized." -TargetPC "General" -Color ([System.Drawing.Color]::Gray)
         $txtPC.Focus() 
     })
     

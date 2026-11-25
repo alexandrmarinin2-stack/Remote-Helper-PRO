@@ -122,6 +122,7 @@ function Stop-RemoteProcess {
     } -ArgumentList $ProcessId, $ProcessName
 }
 
+
 # НОВАЯ ФУНКЦИЯ 4: Получение критических ошибок из Event Log
 function Get-RemoteEventLogs {
     param($Session)
@@ -129,4 +130,36 @@ function Get-RemoteEventLogs {
         Get-WinEvent -FilterHashtable @{LogName='System'; Level=1,2; StartTime=(Get-Date).AddDays(-1)} -MaxEvents 30 -ErrorAction SilentlyContinue | 
         Select-Object PSComputerName, TimeCreated, Id, LevelDisplayName, ProviderName, Message
     }
+}
+
+
+# ОБНОВЛЕННАЯ ФУНКЦИЯ: Поиск папки
+function Find-RemoteFolder {
+    param($Session, [string]$SearchQuery)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        param($query)
+        
+        # 1. Проверяем точный путь
+        if (Test-Path $query) { 
+            return [PSCustomObject]@{ PC = $env:COMPUTERNAME; Status = "Found"; Path = (Resolve-Path $query).Path } 
+        }
+        
+        # 2. Ищем по имени в стандартных папках
+        $searchPaths = @("C:\Program Files", "C:\Program Files (x86)", "C:\ProgramData", "C:\Users\Public")
+        $results = @()
+        
+        foreach ($path in $searchPaths) {
+            if (Test-Path $path) {
+                $found = Get-ChildItem -Path $path -Filter "*$query*" -Directory -Recurse -Depth 2 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+                if ($found) { $results += $found }
+            }
+        }
+        
+        # 3. Возвращаем результат
+        if ($results.Count -gt 0) {
+            return $results | Select-Object -First 5 | ForEach-Object { [PSCustomObject]@{ PC = $env:COMPUTERNAME; Status = "Found"; Path = $_ } }
+        } else {
+            return [PSCustomObject]@{ PC = $env:COMPUTERNAME; Status = "NotFound"; Path = "Not found." }
+        }
+    } -ArgumentList $SearchQuery
 }
