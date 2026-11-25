@@ -1,0 +1,7 @@
+git init
+"Installers/`n*.log" | Out-File -FilePath ".gitignore" -Encoding utf8
+git add .
+git commit -m "Initial commit: Remote Helper PRO"
+git branch -M main
+git remote add origin https://github.com/alexandrmarinin2-stack/Remote-Helper-PRO.git
+git push -u origin main
