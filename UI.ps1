@@ -9,7 +9,7 @@
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Remote Helper PRO"
-    $form.Size = New-Object System.Drawing.Size(760, 600)
+    $form.Size = New-Object System.Drawing.Size(760, 680)
     $form.StartPosition = "CenterScreen"
     $form.BackColor = $bgColor
     $form.ForeColor = $textColor
@@ -25,14 +25,19 @@
     $lblPC.ForeColor = $textColor
     $form.Controls.Add($lblPC)
 
-    $txtPC = New-Object System.Windows.Forms.TextBox
+    # ЗАМЕНИЛИ TEXTBOX НА COMBOBOX (Выпадающий список)
+    $txtPC = New-Object System.Windows.Forms.ComboBox
     $txtPC.Location = New-Object System.Drawing.Point(85, 12)
     $txtPC.Size = New-Object System.Drawing.Size(180, 20)
     $txtPC.BackColor = $panelColor
     $txtPC.ForeColor = $textColor
-    $txtPC.BorderStyle = 'FixedSingle'
+    $txtPC.FlatStyle = 'Flat'
+    $txtPC.DropDownStyle = 'DropDown' # Разрешаем вводить текст вручную
     $txtPC.AutoCompleteMode = 'SuggestAppend'
-    $txtPC.AutoCompleteSource = 'CustomSource'
+    $txtPC.AutoCompleteSource = 'ListItems'
+    
+    # Клик по полю сразу открывает список
+    $txtPC.Add_Click({ $txtPC.DroppedDown = $true })
     $form.Controls.Add($txtPC)
 
     $btnConnect = New-Object System.Windows.Forms.Button
@@ -44,6 +49,14 @@
     $btnConnect.FlatStyle = 'Flat'
     $btnConnect.FlatAppearance.BorderColor = [System.Drawing.Color]::Gray
     $form.Controls.Add($btnConnect)
+
+    # Нажатие Enter в поле ввода нажимает кнопку Connect
+    $txtPC.Add_KeyDown({
+        if ($_.KeyCode -eq 'Enter') { 
+            $_.SuppressKeyPress = $true # Чтобы не пикало
+            $btnConnect.PerformClick() 
+        }
+    })
 
     $lblStatus = New-Object System.Windows.Forms.Label
     $lblStatus.Text = "Status: Disconnected"
@@ -65,7 +78,11 @@
     $line.Size = New-Object System.Drawing.Size(725, 2)
     $form.Controls.Add($line)
 
-    # --- БЛОК КНОПОК ---
+    # ==========================================
+    # БЛОК КНОПОК И УСТАНОВКИ
+    # ==========================================
+
+    # 1-й ряд (Диагностика - Синий)
     $btnSysInfo = New-Object System.Windows.Forms.Button
     $btnSysInfo.Text = "System Info"
     $btnSysInfo.Location = New-Object System.Drawing.Point(10, 60)
@@ -151,7 +168,7 @@
     $btnRefreshList.Font = New-Object System.Drawing.Font("Segoe UI Emoji", 14, [System.Drawing.FontStyle]::Bold)
     $form.Controls.Add($btnRefreshList)
 
-    # 3-й ряд
+    # 3-й ряд (Действия)
     $btnClearTemp = New-Object System.Windows.Forms.Button
     $btnClearTemp.Text = "Clear Temp"
     $btnClearTemp.Location = New-Object System.Drawing.Point(10, 140)
@@ -172,6 +189,16 @@
     $btnFixSpooler.Enabled = $false
     $form.Controls.Add($btnFixSpooler)
 
+    $btnUpdates = New-Object System.Windows.Forms.Button
+    $btnUpdates.Text = "Win Updates"
+    $btnUpdates.Location = New-Object System.Drawing.Point(300, 140)
+    $btnUpdates.Size = New-Object System.Drawing.Size(135, 30)
+    $btnUpdates.BackColor = $actionColor; $btnUpdates.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
+    $btnUpdates.FlatStyle = 'Flat'; $btnUpdates.FlatAppearance.BorderSize = 0
+    $btnUpdates.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
+    $btnUpdates.Enabled = $false
+    $form.Controls.Add($btnUpdates)
+
     $btnReboot = New-Object System.Windows.Forms.Button
     $btnReboot.Text = "Reboot PC"
     $btnReboot.Location = New-Object System.Drawing.Point(590, 140)
@@ -182,12 +209,33 @@
     $btnReboot.Enabled = $false
     $form.Controls.Add($btnReboot)
 
-    $allActionButtons = @($btnSysInfo, $btnDiskSpace, $btnSearchApps, $btnRunCmd, $btnInstall, $btnClearTemp, $btnFixSpooler, $btnReboot)
+    # 4-й ряд (Новые фичи)
+    $btnProcesses = New-Object System.Windows.Forms.Button
+    $btnProcesses.Text = "Processes"
+    $btnProcesses.Location = New-Object System.Drawing.Point(10, 180)
+    $btnProcesses.Size = New-Object System.Drawing.Size(135, 30)
+    $btnProcesses.BackColor = $diagColor; $btnProcesses.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
+    $btnProcesses.FlatStyle = 'Flat'; $btnProcesses.FlatAppearance.BorderSize = 0
+    $btnProcesses.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
+    $btnProcesses.Enabled = $false
+    $form.Controls.Add($btnProcesses)
+
+    $btnEventLogs = New-Object System.Windows.Forms.Button
+    $btnEventLogs.Text = "Event Logs"
+    $btnEventLogs.Location = New-Object System.Drawing.Point(155, 180)
+    $btnEventLogs.Size = New-Object System.Drawing.Size(135, 30)
+    $btnEventLogs.BackColor = $diagColor; $btnEventLogs.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
+    $btnEventLogs.FlatStyle = 'Flat'; $btnEventLogs.FlatAppearance.BorderSize = 0
+    $btnEventLogs.Font = New-Object System.Drawing.Font("Segoe UI", 8.5, [System.Drawing.FontStyle]::Bold)
+    $btnEventLogs.Enabled = $false
+    $form.Controls.Add($btnEventLogs)
+
+    $allActionButtons = @($btnSysInfo, $btnDiskSpace, $btnSearchApps, $btnRunCmd, $btnInstall, $btnClearTemp, $btnFixSpooler, $btnUpdates, $btnReboot, $btnProcesses, $btnEventLogs)
 
     # --- ОКНО ЛОГА ---
     $global:txtLog = New-Object System.Windows.Forms.TextBox
-    $global:txtLog.Location = New-Object System.Drawing.Point(10, 180)
-    $global:txtLog.Size = New-Object System.Drawing.Size(725, 330)
+    $global:txtLog.Location = New-Object System.Drawing.Point(10, 220)
+    $global:txtLog.Size = New-Object System.Drawing.Size(725, 380)
     $global:txtLog.Multiline = $true
     $global:txtLog.ScrollBars = "Vertical"
     $global:txtLog.ReadOnly = $true
@@ -200,7 +248,7 @@
     # Кнопки логов
     $btnClear = New-Object System.Windows.Forms.Button
     $btnClear.Text = "Clear Log"
-    $btnClear.Location = New-Object System.Drawing.Point(10, 520)
+    $btnClear.Location = New-Object System.Drawing.Point(10, 610)
     $btnClear.Size = New-Object System.Drawing.Size(100, 25)
     $btnClear.BackColor = $panelColor; $btnClear.ForeColor = $dangerColor
     $btnClear.FlatStyle = 'Flat'; $btnClear.FlatAppearance.BorderSize = 0
@@ -209,7 +257,7 @@
 
     $btnOpenLogs = New-Object System.Windows.Forms.Button
     $btnOpenLogs.Text = "Open Logs" 
-    $btnOpenLogs.Location = New-Object System.Drawing.Point(120, 520)
+    $btnOpenLogs.Location = New-Object System.Drawing.Point(120, 610)
     $btnOpenLogs.Size = New-Object System.Drawing.Size(100, 25)
     $btnOpenLogs.BackColor = $panelColor; $btnOpenLogs.ForeColor = $diagColor 
     $btnOpenLogs.FlatStyle = 'Flat'; $btnOpenLogs.FlatAppearance.BorderSize = 0
@@ -258,9 +306,13 @@
     $btnConnect.Add_Click({
         $rawPCs = $txtPC.Text.Trim()
         if (-not $rawPCs) { return }
+        
         Add-PCHistory -PCString $rawPCs
-        $txtPC.AutoCompleteCustomSource.Clear()
-        $txtPC.AutoCompleteCustomSource.AddRange($global:PCHistory)
+        
+        # Обновляем список в ComboBox
+        $txtPC.Items.Clear()
+        if ($global:PCHistory.Count -gt 0) { $txtPC.Items.AddRange($global:PCHistory) }
+
         $pcList = $rawPCs -split '[, ]+' | Where-Object { $_ -ne "" }
 
         Execute-AsyncAction {
@@ -305,33 +357,82 @@
     })
 
     $btnSysInfo.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Fetching info..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); $res = Get-RemoteSystemInfo -Session $global:PSSession; $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.Info)" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Cyan) } } })
-
-    $btnRunCmd.Add_Click({
-        $cmd = [Microsoft.VisualBasic.Interaction]::InputBox("Enter command:", "Run", "Get-Service")
-        if ($cmd) {
-            Execute-AsyncAction {
-                Write-UILog -LogBox $global:txtLog -Message "Executing: $cmd" -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
-                $res = Invoke-RemoteCustomCommand -Session $global:PSSession -Command $cmd
-                $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::White) }
-            }
-        }
-    })
-
-    $btnReboot.Add_Click({
-        $confirm = [System.Windows.Forms.MessageBox]::Show("Reboot selected PC(s)?", "Confirm", "YesNo", "Question")
-        if ($confirm -eq "Yes") {
-            Execute-AsyncAction {
-                Write-UILog -LogBox $global:txtLog -Message "Sending reboot..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
-                $res = Restart-RemotePC -Session $global:PSSession
-                $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.ToString())" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) }
-            }
-        }
-    })
-
+    $btnRunCmd.Add_Click({ $cmd = [Microsoft.VisualBasic.Interaction]::InputBox("Enter command:", "Run", "Get-Service"); if ($cmd) { Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Executing: $cmd" -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); $res = Invoke-RemoteCustomCommand -Session $global:PSSession -Command $cmd; $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::White) } } } })
+    $btnReboot.Add_Click({ $confirm = [System.Windows.Forms.MessageBox]::Show("Reboot selected PC(s)?", "Confirm", "YesNo", "Question"); if ($confirm -eq "Yes") { Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Sending reboot..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); $res = Restart-RemotePC -Session $global:PSSession; $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.ToString())" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } } })
     $btnClearTemp.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Clearing Temp..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); (Clear-RemoteTemp -Session $global:PSSession) | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } })
     $btnDiskSpace.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Checking Disk Space..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); (Get-RemoteDiskSpace -Session $global:PSSession) | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Cyan) } } })
     $btnFixSpooler.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Restarting Spooler..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); (Restart-RemoteSpooler -Session $global:PSSession) | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $_" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } })
+    $btnUpdates.Add_Click({ Execute-AsyncAction { Write-UILog -LogBox $global:txtLog -Message "Searching and installing updates (this may take a while)..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow); $res = Install-RemoteUpdates -Session $global:PSSession; $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.ToString())" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) } } })
 
+    # Окно процессов
+    $btnProcesses.Add_Click({
+        Execute-AsyncAction {
+            Write-UILog -LogBox $global:txtLog -Message "Fetching processes..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
+            $procs = Get-RemoteProcesses -Session $global:PSSession
+            $formProc = New-Object System.Windows.Forms.Form
+            $formProc.Text = "Top 20 Processes by RAM"
+            $formProc.Size = New-Object System.Drawing.Size(750, 450)
+            $formProc.StartPosition = "CenterParent"
+            $formProc.BackColor = $bgColor; $formProc.ForeColor = $textColor; $formProc.Icon = $form.Icon
+            $grid = New-Object System.Windows.Forms.DataGridView
+            $grid.Location = New-Object System.Drawing.Point(10, 10); $grid.Size = New-Object System.Drawing.Size(710, 330)
+            $grid.BackgroundColor = $bgColor; $grid.GridColor = $panelColor
+            $grid.DefaultCellStyle.BackColor = $bgColor; $grid.DefaultCellStyle.ForeColor = $textColor
+            $grid.DefaultCellStyle.SelectionBackColor = $accentColor; $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::Black
+            $grid.AutoSizeColumnsMode = 'Fill'; $grid.AllowUserToAddRows = $false; $grid.ReadOnly = $true
+            $grid.SelectionMode = 'FullRowSelect'; $grid.MultiSelect = $false
+            $grid.DataSource = [System.Collections.ArrayList]@($procs)
+            $formProc.Controls.Add($grid)
+            $btnKill = New-Object System.Windows.Forms.Button
+            $btnKill.Text = "Kill Selected Process"
+            $btnKill.Location = New-Object System.Drawing.Point(10, 360); $btnKill.Size = New-Object System.Drawing.Size(200, 30)
+            $btnKill.BackColor = $dangerColor; $btnKill.ForeColor = [System.Drawing.Color]::FromArgb(17, 17, 27)
+            $btnKill.FlatStyle = 'Flat'; $btnKill.FlatAppearance.BorderSize = 0
+            $btnKill.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+            $formProc.Controls.Add($btnKill)
+            $btnKill.Add_Click({
+                if ($grid.SelectedRows.Count -eq 0) { return }
+                $row = $grid.SelectedRows[0]
+                $pId = $row.Cells["Id"].Value; $pName = $row.Cells["ProcessName"].Value; $pComp = $row.Cells["PSComputerName"].Value
+                $confirm = [System.Windows.Forms.MessageBox]::Show("Kill process $pName (ID: $pId) on $pComp?", "Confirm", "YesNo", "Warning")
+                if ($confirm -eq "Yes") {
+                    Write-UILog -LogBox $global:txtLog -Message "Killing process $pName..." -TargetPC $pComp -Color ([System.Drawing.Color]::Yellow)
+                    $res = Stop-RemoteProcess -Session $global:PSSession -ProcessId $pId -ProcessName $pName
+                    $res | ForEach-Object { Write-UILog -LogBox $global:txtLog -Message "[$($_.PSComputerName)] $($_.ToString())" -TargetPC $_.PSComputerName -Color ([System.Drawing.Color]::Green) }
+                    $formProc.Close()
+                }
+            })
+            $formProc.Add_Shown({ [DarkTitleBar]::Apply($formProc.Handle) })
+            $formProc.ShowDialog(); $formProc.Dispose()
+        }
+    })
+
+    # Окно логов
+    $btnEventLogs.Add_Click({
+        Execute-AsyncAction {
+            Write-UILog -LogBox $global:txtLog -Message "Fetching system errors from last 24h..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
+            $logs = Get-RemoteEventLogs -Session $global:PSSession
+            $formLogs = New-Object System.Windows.Forms.Form
+            $formLogs.Text = "System Errors (Last 24h)"
+            $formLogs.Size = New-Object System.Drawing.Size(900, 500)
+            $formLogs.StartPosition = "CenterParent"
+            $formLogs.BackColor = $bgColor; $formLogs.ForeColor = $textColor; $formLogs.Icon = $form.Icon
+            $grid = New-Object System.Windows.Forms.DataGridView
+            $grid.Location = New-Object System.Drawing.Point(10, 10); $grid.Size = New-Object System.Drawing.Size(860, 440)
+            $grid.BackgroundColor = $bgColor; $grid.GridColor = $panelColor
+            $grid.DefaultCellStyle.BackColor = $bgColor; $grid.DefaultCellStyle.ForeColor = $textColor
+            $grid.DefaultCellStyle.SelectionBackColor = $accentColor; $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::Black
+            $grid.AutoSizeColumnsMode = 'Fill'; $grid.AllowUserToAddRows = $false; $grid.ReadOnly = $true
+            $grid.DataSource = [System.Collections.ArrayList]@($logs)
+            if ($grid.Columns["Message"]) { $grid.Columns["Message"].AutoSizeMode = 'None'; $grid.Columns["Message"].Width = 200 }
+            if ($grid.Columns["TimeCreated"]) { $grid.Columns["TimeCreated"].DefaultCellStyle.Format = 'g' }
+            $formLogs.Controls.Add($grid)
+            $formLogs.Add_Shown({ [DarkTitleBar]::Apply($formLogs.Handle) })
+            $formLogs.ShowDialog(); $formLogs.Dispose()
+        }
+    })
+
+    # Окно поиска программ
     $btnSearchApps.Add_Click({
         Execute-AsyncAction {
             Write-UILog -LogBox $global:txtLog -Message "Fetching all installed apps..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
@@ -340,49 +441,30 @@
                 Where-Object { $_.DisplayName -ne $null -and $_.DisplayName -ne "" } | 
                 Select-Object PSComputerName, DisplayName, DisplayVersion
             }
-
             $formApps = New-Object System.Windows.Forms.Form
             $formApps.Text = "Installed Applications"
             $formApps.Size = New-Object System.Drawing.Size(800, 500)
             $formApps.StartPosition = "CenterParent"
-            $formApps.BackColor = $bgColor
-            $formApps.Icon = $form.Icon
-
-            $lblSearch = New-Object System.Windows.Forms.Label
-            $lblSearch.Text = "Search:"
-            $lblSearch.Location = New-Object System.Drawing.Point(10, 15)
-            $lblSearch.ForeColor = $textColor
+            $formApps.BackColor = $bgColor; $formApps.Icon = $form.Icon
+            $lblSearch = New-Object System.Windows.Forms.Label; $lblSearch.Text = "Search:"; $lblSearch.Location = New-Object System.Drawing.Point(10, 15); $lblSearch.ForeColor = $textColor
             $formApps.Controls.Add($lblSearch)
-
-            $txtSearch = New-Object System.Windows.Forms.TextBox
-            $txtSearch.Location = New-Object System.Drawing.Point(60, 12)
-            $txtSearch.Size = New-Object System.Drawing.Size(710, 20)
-            $txtSearch.BackColor = $panelColor; $txtSearch.ForeColor = $textColor
-            $formApps.Controls.Add($txtSearch)
-
+            $txtSearch = New-Object System.Windows.Forms.TextBox; $txtSearch.Location = New-Object System.Drawing.Point(60, 12); $txtSearch.Size = New-Object System.Drawing.Size(710, 20)
+            $txtSearch.BackColor = $panelColor; $txtSearch.ForeColor = $textColor; $formApps.Controls.Add($txtSearch)
             $grid = New-Object System.Windows.Forms.DataGridView
-            $grid.Location = New-Object System.Drawing.Point(10, 40)
-            $grid.Size = New-Object System.Drawing.Size(760, 400)
-            $grid.BackgroundColor = $bgColor
-            $grid.GridColor = $panelColor
-            $grid.DefaultCellStyle.BackColor = $bgColor
-            $grid.DefaultCellStyle.ForeColor = $textColor
-            $grid.DefaultCellStyle.SelectionBackColor = $accentColor
-            $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::Black
-            $grid.AutoSizeColumnsMode = 'Fill'
-            $grid.AllowUserToAddRows = $false; $grid.ReadOnly = $true
+            $grid.Location = New-Object System.Drawing.Point(10, 40); $grid.Size = New-Object System.Drawing.Size(760, 400)
+            $grid.BackgroundColor = $bgColor; $grid.GridColor = $panelColor
+            $grid.DefaultCellStyle.BackColor = $bgColor; $grid.DefaultCellStyle.ForeColor = $textColor
+            $grid.DefaultCellStyle.SelectionBackColor = $accentColor; $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::Black
+            $grid.AutoSizeColumnsMode = 'Fill'; $grid.AllowUserToAddRows = $false; $grid.ReadOnly = $true
             $grid.DataSource = [System.Collections.ArrayList]@($apps)
             $formApps.Controls.Add($grid)
-
             $txtSearch.Add_TextChanged({
                 $search = $txtSearch.Text
                 $filtered = $apps | Where-Object { $_.DisplayName -like "*$search*" -or $_.PSComputerName -like "*$search*" }
                 $grid.DataSource = [System.Collections.ArrayList]@($filtered)
             })
-
             $formApps.Add_Shown({ [DarkTitleBar]::Apply($formApps.Handle) })
-            $formApps.ShowDialog()
-            $formApps.Dispose()
+            $formApps.ShowDialog(); $formApps.Dispose()
         }
     })
 
@@ -397,8 +479,14 @@
     $form.Add_Shown({ 
         [DarkTitleBar]::Apply($form.Handle)
         Load-PCHistory
-        $txtPC.AutoCompleteCustomSource.Clear()
-        if ($global:PCHistory.Count -gt 0) { $txtPC.AutoCompleteCustomSource.AddRange($global:PCHistory) }
+        
+        # Заполняем ComboBox историей
+        $txtPC.Items.Clear()
+        if ($global:PCHistory.Count -gt 0) { 
+            $txtPC.Items.AddRange($global:PCHistory)
+            $txtPC.Text = $global:PCHistory[0] # Автоматически подставляем последний ПК
+        }
+        
         Refresh-InstallerList
         Write-UILog -LogBox $global:txtLog -Message "Program initialized. Drop .exe/.msi into the Installers folder." -TargetPC "General" -Color ([System.Drawing.Color]::Gray)
         $txtPC.Focus() 

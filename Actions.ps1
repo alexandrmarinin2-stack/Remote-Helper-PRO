@@ -67,3 +67,66 @@ function Restart-RemoteSpooler {
         "Print Spooler restarted."
     }
 }
+
+# НОВАЯ ФУНКЦИЯ 1: Установка обновлений Windows
+function Install-RemoteUpdates {
+    param($Session)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        try {
+            $updateSession = New-Object -ComObject Microsoft.Update.Session
+            $updateSearcher = $updateSession.CreateUpdateSearcher()
+            # Ищем неустановленные обновления
+            $searchResult = $updateSearcher.Search("IsInstalled=0 and Type='Software' and IsHidden=0")
+            
+            if ($searchResult.Updates.Count -eq 0) { return "No updates available." }
+            
+            $updatesToInstall = New-Object -ComObject Microsoft.Update.UpdateColl
+            foreach ($update in $searchResult.Updates) { $updatesToInstall.Add($update) | Out-Null }
+            
+            $downloader = $updateSession.CreateUpdateDownloader()
+            $downloader.Updates = $updatesToInstall
+            $downloader.Download() | Out-Null
+            
+            $installer = $updateSession.CreateUpdateInstaller()
+            $installer.Updates = $updatesToInstall
+            $installResult = $installer.Install()
+            
+            return "Updates installed: $($updatesToInstall.Count). Reboot required: $($installResult.RebootRequired)"
+        } catch {
+            return "Failed to install updates: $($_.Exception.Message)"
+        }
+    }
+}
+
+# НОВАЯ ФУНКЦИЯ 2: Получение списка процессов (топ по памяти)
+function Get-RemoteProcesses {
+    param($Session)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        Get-Process | Sort-Object -Property WorkingSet64 -Descending | 
+        Select-Object -First 20 -Property PSComputerName, ProcessName, Id, 
+        @{N='RAM(MB)';E={[math]::Round($_.WorkingSet64/1MB,2)}}
+    }
+}
+
+# НОВАЯ ФУНКЦИЯ 3: Убить процесс
+function Stop-RemoteProcess {
+    param($Session, $ProcessId, $ProcessName)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        param($pId, $pName)
+        try {
+            Stop-Process -Id $pId -Force -ErrorAction Stop
+            return "Killed process $pName (ID: $pId)."
+        } catch {
+            return "Error killing $pName (ID: $pId): $_"
+        }
+    } -ArgumentList $ProcessId, $ProcessName
+}
+
+# НОВАЯ ФУНКЦИЯ 4: Получение критических ошибок из Event Log
+function Get-RemoteEventLogs {
+    param($Session)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        Get-WinEvent -FilterHashtable @{LogName='System'; Level=1,2; StartTime=(Get-Date).AddDays(-1)} -MaxEvents 30 -ErrorAction SilentlyContinue | 
+        Select-Object PSComputerName, TimeCreated, Id, LevelDisplayName, ProviderName, Message
+    }
+}
