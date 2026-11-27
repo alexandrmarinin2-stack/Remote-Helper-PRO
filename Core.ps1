@@ -24,11 +24,11 @@ function Connect-ToRemotePC {
         try {
             [System.Net.Dns]::GetHostAddresses($pc) | Out-Null
         } catch {
-            Write-UILog -LogBox $global:txtLog -Message "Error: PC '$pc' not found in DNS. Skipping..." -TargetPC $pc -Color ([System.Drawing.Color]::Red)
+            Write-UILog -LogBox $global:txtLog -Message "Ошибка: ПК '$pc' не найден в DNS. Пропускаем..." -TargetPC $pc -Color ([System.Drawing.Color]::Red)
             continue
         }
 
-        Write-UILog -LogBox $global:txtLog -Message "Checking $pc..." -TargetPC $pc -Color ([System.Drawing.Color]::Yellow)
+        Write-UILog -LogBox $global:txtLog -Message "Проверка $pc..." -TargetPC $pc -Color ([System.Drawing.Color]::Yellow)
         
         $isReachable = $false
         $checkReason = ""
@@ -36,22 +36,22 @@ function Connect-ToRemotePC {
         if (Test-Connection -ComputerName $pc -Count 1 -Quiet -ErrorAction SilentlyContinue) {
             $isReachable = $true; $checkReason = "ICMP (Ping)"
         } elseif (Test-TcpPort -ComputerName $pc -Port 5985) {
-            $isReachable = $true; $checkReason = "WinRM Port (TCP 5985)"
+            $isReachable = $true; $checkReason = "Порт WinRM (TCP 5985)"
         } elseif (Test-TcpPort -ComputerName $pc -Port 445) {
-            $isReachable = $true; $checkReason = "SMB Port (TCP 445)"
+            $isReachable = $true; $checkReason = "Порт SMB (TCP 445)"
         }
 
         if ($isReachable) {
-            Write-UILog -LogBox $global:txtLog -Message "[$pc] Online via $checkReason" -TargetPC $pc -Color ([System.Drawing.Color]::Green)
+            Write-UILog -LogBox $global:txtLog -Message "[$pc] Доступен через $checkReason" -TargetPC $pc -Color ([System.Drawing.Color]::Green)
             $validPCs += $pc
         } else {
-            Write-UILog -LogBox $global:txtLog -Message "[$pc] Offline. All ports blocked. Skipping." -TargetPC $pc -Color ([System.Drawing.Color]::Red)
+            Write-UILog -LogBox $global:txtLog -Message "[$pc] Недоступен. Все порты закрыты. Пропускаем." -TargetPC $pc -Color ([System.Drawing.Color]::Red)
         }
     }
 
-    if ($validPCs.Count -eq 0) { throw "No reachable PCs found. Aborting." }
+    if ($validPCs.Count -eq 0) { throw "Нет доступных ПК. Отмена." }
 
-    Write-UILog -LogBox $global:txtLog -Message "Creating WinRM sessions for $($validPCs.Count) PC(s)..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
+    Write-UILog -LogBox $global:txtLog -Message "Создание WinRM сессий для $($validPCs.Count) ПК..." -TargetPC "General" -Color ([System.Drawing.Color]::Yellow)
     return New-PSSession -ComputerName $validPCs -ErrorAction Stop
 }
 
