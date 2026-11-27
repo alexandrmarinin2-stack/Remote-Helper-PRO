@@ -231,3 +231,31 @@ function Remove-RemoteItem {
         }
     } -ArgumentList $Path
 }
+# ... (ваш старый код Actions.ps1) ...
+
+# НОВАЯ: Точное копирование файла и проверка
+function Copy-RemoteInstaller {
+    param($Session, [string]$FilePath)
+    $fileName = Split-Path $FilePath -Leaf
+    $remotePath = "C:\Windows\Temp\$fileName"
+    
+    Copy-Item -Path $FilePath -Destination $remotePath -ToSession $Session -Force
+    
+    # Проверяем, что файл действительно появился
+    $exists = Invoke-Command -Session $Session -ScriptBlock { param($p) Test-Path $p } -ArgumentList $remotePath
+    return [PSCustomObject]@{ FileName = $fileName; RemotePath = $remotePath; Success = $exists }
+}
+
+# НОВАЯ: Удаление файла с удаленного ПК
+function Remove-RemoteFile {
+    param($Session, [string]$FileName)
+    return Invoke-Command -Session $Session -ScriptBlock {
+        param($name)
+        $path = "C:\Windows\Temp\$name"
+        if (Test-Path $path) {
+            Remove-Item -Path $path -Force -ErrorAction SilentlyContinue
+            return "Файл $name успешно удален."
+        }
+        return "Файл $name не найден."
+    } -ArgumentList $FileName
+}

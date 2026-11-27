@@ -58,3 +58,23 @@ function Add-PCHistory {
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     $global:PCHistory | ConvertTo-Json | Out-File $global:HistoryFile -Encoding utf8
 }
+# ... (ваш старый код Utils.ps1) ...
+
+# --- УПРАВЛЕНИЕ КЛЮЧАМИ УСТАНОВКИ ---
+$global:InstallerKeysFile = "$env:LOCALAPPDATA\RemoteHelper\installer_keys.json"
+$global:InstallerKeys = @{}
+
+function Load-InstallerKeys {
+    if (Test-Path $global:InstallerKeysFile) {
+        try {
+            $json = Get-Content $global:InstallerKeysFile -Raw | ConvertFrom-Json
+            $json.PSObject.Properties | ForEach-Object { $global:InstallerKeys[$_.Name] = $_.Value }
+        } catch {}
+    }
+}
+
+function Save-InstallerKeys {
+    $dir = Split-Path $global:InstallerKeysFile -Parent
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $global:InstallerKeys | ConvertTo-Json | Out-File $global:InstallerKeysFile -Encoding utf8
+}
